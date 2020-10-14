@@ -40,6 +40,7 @@
     "camelcase": "off",
     "@typescript-eslint/ban-types": "off",
     "no-use-before-define": "off",
+    "jsx-a11y/label-has-associated-control": "off",
     "react/jsx-filename-extension": [
       1,
       {
