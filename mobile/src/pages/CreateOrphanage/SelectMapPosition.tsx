@@ -1,18 +1,29 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, Dimensions, Text } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { RectButton } from 'react-native-gesture-handler';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { MapEvent, Marker } from 'react-native-maps';
 
 import mapMarkerImg from '../../images/map-marker.png';
 
 const SelectMapPosition: React.FC = () => {
+  const [position, setPosition] = useState({ latitude: 0, longitude: 0 });
+
   const navigation = useNavigation();
 
-  function handleNextStep() {
-    navigation.navigate('OrphanageData');
-  }
+  const handleNextStep = useCallback(() => {
+    navigation.navigate('OrphanageData', { position });
+  }, [navigation, position]);
+
+  const handleSelectMapPosition = useCallback((event: MapEvent) => {
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+
+    setPosition({
+      latitude,
+      longitude,
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -24,16 +35,24 @@ const SelectMapPosition: React.FC = () => {
           longitudeDelta: 0.008,
         }}
         style={styles.mapStyle}
+        onPress={handleSelectMapPosition}
       >
-        <Marker
-          icon={mapMarkerImg}
-          coordinate={{ latitude: -27.2092052, longitude: -49.6401092 }}
-        />
+        {position.latitude !== 0 && (
+          <Marker
+            icon={mapMarkerImg}
+            coordinate={{
+              latitude: position.latitude,
+              longitude: position.longitude,
+            }}
+          />
+        )}
       </MapView>
 
-      <RectButton style={styles.nextButton} onPress={handleNextStep}>
-        <Text style={styles.nextButtonText}>Próximo</Text>
-      </RectButton>
+      {position.latitude !== 0 && (
+        <RectButton style={styles.nextButton} onPress={handleNextStep}>
+          <Text style={styles.nextButtonText}>Próximo</Text>
+        </RectButton>
+      )}
     </View>
   );
 };
